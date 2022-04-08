@@ -1,0 +1,4 @@
+Django
+psycopg2-binary
+djangorestframework-simplejwt
+strawberry-graphql-django==0.2.5
