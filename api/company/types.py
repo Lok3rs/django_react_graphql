@@ -4,14 +4,14 @@ from company import models
 
 
 @gql.django.type(models.Company)
-class Company:
+class Company(gql.Node):
     id: gql.auto
     name: str
     employees: List['Employee']
 
 
 @gql.django.type(models.Employee)
-class Employee:
+class Employee(gql.Node):
     id: gql.auto
     first_name: str
     last_name: str
@@ -20,7 +20,7 @@ class Employee:
 
 
 @gql.django.type(models.Project)
-class Project:
+class Project(gql.Node):
     id: gql.auto
     duration_hours: float
     employees: List[Employee]
