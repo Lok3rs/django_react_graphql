@@ -25,6 +25,13 @@ class EmployeeInput:
     company: gql.auto
 
 
+@gql.django.partial(models.Employee)
+class EmployeeInputPartial(gql.NodeInput):
+    first_name: gql.auto
+    last_name: gql.auto
+    company: gql.auto
+
+
 @gql.type
 class Query:
     companies: List[types.Company] = gql.django.field()
@@ -34,6 +41,9 @@ class Query:
 
 @gql.type
 class Mutation:
+    # !IMPORTANT : ID FIELD NEEDS TO BE ALWAYS ENCODED TO BASE64
+    # For example Company:1 == Q29tcGFueTox
+
     """
     mutation {
       createCompany(input: {name: "First Company"}) {
@@ -44,10 +54,30 @@ class Mutation:
     }
     """
     create_company: types.Company = gql.django.create_mutation(CompanyInput)
+
+    """
+    mutation {
+      updateCompany(input: {id: "Q29tcGFueTox", name: "First Name Changed"}) {
+        ... on Company {
+          name
+        }
+      }
+    }
+   """
     update_company: types.Company = gql.django.update_mutation(CompanyInputPartial)
     delete_company: types.Company = gql.django.delete_mutation(gql.NodeInput)
-
+    """
+    mutation {
+      createEmployee(input: {firstName: "Dawid", lastName: "Adamski", company: {id: "Q29tcGFueTox"}}) {
+        ... on Employee {
+          firstName
+        }
+      }
+    }
+    """
     create_employee: types.Employee = gql.django.create_mutation(EmployeeInput)
+    update_employee: types.Employee = gql.django.update_mutation(EmployeeInputPartial)
+    delete_employee: types.Employee = gql.django.delete_mutation(gql.NodeInput)
 
 
 schema = strawberry.Schema(query=Query, mutation=Mutation, extensions=[DjangoOptimizerExtension])
