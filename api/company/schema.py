@@ -23,6 +23,7 @@ class EmployeeInput:
     first_name: gql.auto
     last_name: gql.auto
     company: gql.auto
+    projects: gql.auto
 
 
 @gql.django.partial(models.Employee)
@@ -30,6 +31,22 @@ class EmployeeInputPartial(gql.NodeInput):
     first_name: gql.auto
     last_name: gql.auto
     company: gql.auto
+    projects: gql.auto
+
+
+@gql.django.input(models.Project)
+class ProjectInput:
+    type: gql.auto
+    duration_hours: gql.auto
+    # TODO: Ask Albert how to write proper lists queries + how it should be implemented on api side
+    employees: List[EmployeeInput]
+
+
+@gql.django.partial(models.Project)
+class ProjectInputPartial(gql.NodeInput):
+    type: gql.auto
+    duration_hours: gql.auto
+    employees: gql.auto
 
 
 @gql.type
@@ -78,6 +95,10 @@ class Mutation:
     create_employee: types.Employee = gql.django.create_mutation(EmployeeInput)
     update_employee: types.Employee = gql.django.update_mutation(EmployeeInputPartial)
     delete_employee: types.Employee = gql.django.delete_mutation(gql.NodeInput)
+
+    create_project: types.Project = gql.django.create_mutation(ProjectInput)
+    update_project: types.Project = gql.django.update_mutation(ProjectInputPartial)
+    delete_project: types.Project = gql.django.delete_mutation(gql.NodeInput)
 
 
 schema = strawberry.Schema(query=Query, mutation=Mutation, extensions=[DjangoOptimizerExtension])
